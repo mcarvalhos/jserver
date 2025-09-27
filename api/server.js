@@ -1,21 +1,58 @@
 const jsonServer = require("json-server");
 const cors = require("cors");
+const { Low } = require("lowdb");
+const { Memory } = require("lowdb/node"); // adapter em memória
 
 const server = jsonServer.create();
-const router = jsonServer.router("api/db.json"); // aponta para seu db.json
-const middlewares = jsonServer.defaults({
-  noCors: false,
-});
-
-server.use(cors()); // garante CORS em produção
-server.use(middlewares);
+server.use(cors());
 server.use(jsonServer.bodyParser);
 
+// Adapter em memória
+const adapter = new Memory();
+const db = new Low(adapter);
+
+// Banco inicial
+db.data = {
+  "users": [
+    {
+      "id": 1,
+      "login": "stark",
+      "password": "123456",
+      "name": "Tony Stark",
+      "email": "tony.stark@starkindustries.com",
+      "avatar": "https://wallpaperaccess.com/full/2330391.jpg",
+      "role": "admin"
+    },
+    {
+      "id": 2,
+      "login": "miranha",
+      "password": "654321",
+      "name": "Peter Parker",
+      "email": "miranha@avengers.com",
+      "avatar": "https://wallpaperaccess.com/full/439967.jpg",
+      "role": "user"
+    }
+  ],
+  "contracts": [
+    {
+      "id": 1,
+      "title": "Contrato Alpha",
+      "ownerId": 1,
+      "status": "ativo"
+    },
+    {
+      "id": 2,
+      "title": "Contrato Beta",
+      "ownerId": 2,
+      "status": "pendente"
+    }
+  ]
+};
+
 // 🔑 Rota fake de login
-server.post("/login", (req, res) => {
+server.post("/login", async (req, res) => {
   const { login, password } = req.body;
-  const db = router.db;
-  const user = db.get("users").find({ login, password }).value();
+  const user = db.data.users.find(u => u.login === login && u.password === password);
 
   if (user) {
     return res.json({
@@ -26,14 +63,12 @@ server.post("/login", (req, res) => {
         login: user.login,
         name: user.name,
         email: user.email,
-        avatar: user.avatar,
-      },
+        avatar: user.avatar
+      }
     });
   }
 
-  res
-    .status(401)
-    .json({ success: false, message: "Usuário ou senha inválidos" });
+  res.status(401).json({ success: false, message: "Usuário ou senha inválidos" });
 });
 
 // Protege rotas com token fake (exemplo: /contracts)
@@ -47,11 +82,22 @@ server.use((req, res, next) => {
   next();
 });
 
-// Rotas padrões do JSON Server
-server.use(router);
+// Rotas GET padrão (leitura)
+server.get("/users", (req, res) => {
+  res.json(db.data.users);
+});
 
-// Porta dinâmica para Vercel
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`🚀 Fake API rodando na porta ${PORT}`);
+server.get("/contracts", (req, res) => {
+  res.json(db.data.contracts);
+});
+
+// Opcional: POST, PUT, DELETE funcionam em memória
+server.post("/users", (req, res) => {
+  const newUser = { id: db.data.users.length + 1, ...req.body };
+  db.data.users.push(newUser);
+  res.json(newUser);
+});
+
+server.listen(process.env.PORT || 3000, () => {
+  console.log("🚀 API rodando (em memória)!");
 });
