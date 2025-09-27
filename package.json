@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/mcarvalhos/jserver#readme",
   "dependencies": {
-    "json-server": "^0.17.3"
+    "json-server": "^0.17.3",
+    "lowdb": "^7.0.1"
   }
 }
