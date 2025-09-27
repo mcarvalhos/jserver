@@ -1,0 +1,45 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "login": "stark",
+      "password": "123456",
+      "name": "Tony Stark",
+      "email": "tony.stark@starkindustries.com",
+      "avatar": "https://wallpaperaccess.com/full/2330391.jpg",
+      "role": "admin"
+    },
+    {
+      "id": 2,
+      "login": "miranha",
+      "password": "654321",
+      "name": "Peter Parker",
+      "email": "miranha@avengers.com",
+      "avatar": "https://wallpaperaccess.com/full/439967.jpg",
+      "role": "user"
+    },
+    {
+      "id": 3,
+      "login": "banner",
+      "password": "123123",
+      "name": "Bruce Banner",
+      "email": "verdao@avengers.com",
+      "avatar": "https://wallpaperaccess.com/full/2068957.jpg",
+      "role": "user"
+    }
+  ],
+  "contracts": [
+    {
+      "id": 1,
+      "title": "Contrato Alpha",
+      "ownerId": 1,
+      "status": "ativo"
+    },
+    {
+      "id": 2,
+      "title": "Contrato Beta",
+      "ownerId": 2,
+      "status": "pendente"
+    }
+  ]
+}
